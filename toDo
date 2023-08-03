@@ -1,0 +1,54 @@
+[done!!] ~ Game Setup and Initialization:
+
+    - Set up the game canvas to render the game elements. [√]
+    - Initialize game variables:
+        * ball position. [√]
+        * paddle positions. [√]
+        * scores. [√]
+
+[done!!] ~ Rendering:
+    - Draw the game elements on the canvas:
+        * ball. [√]
+        * paddles. [√]
+        * scoreboard. [√]
+
+[inProgress!!] ~ User Input Handling:
+    - Handle keyboard events to allow players to control their paddles. [...]
+    - Update paddle positions based on user input. [...]
+
+[waiting!!] ~ Game Logic:
+    - Implement the game rules and mechanics:
+        * ball movement. [X]
+        * collision detection. [X]
+    - Update the ball's position and direction based on its velocity. [X]
+    - Check for collisions with the walls and paddles and adjust the ball's direction accordingly. [X]
+    - Update player scores when the ball goes off-screen (missed by a player). [X]
+
+[waiting!!] ~ Real-time Communication (Client-side):
+    - Set up the socket connection to the server using socket. [X]io-client. [X]
+    - Emit events to the server when a player moves their paddle. [X]
+
+[waiting!!] ~ Real-time Communication (Server-side):
+    - Set up the Nest. [X]js server to handle WebSocket connections. [X]
+    - Implement event listeners on the server to receive client events. [X]
+    - Broadcast game state updates to all connected clients to keep them in sync. [X]
+
+[waiting!!] ~ Multiplayer Functionality:
+    - Allow players to join specific rooms or instances of the game. [X]
+    - Implement logic to handle player:
+        * joining. [X]
+        * leaving. [X]
+        * syncing game state between clients in the same room. [X]
+
+[waiting!!] ~ Game Over and Restart:
+    - Determine when the game is over (reaching a certain score or time limit). [X]
+    - Display the winner. [X]
+    - Provide an option to restart the game. [X]
+
+[waiting!!] ~ Optimization and Latency Reduction:
+    - Consider implementing server-side prediction and client-side interpolation to reduce latency. [X]
+    - Optimize the rendering of game elements for better performance. [X]
+
+[waiting!!] ~ Testing and Bug Fixes:
+    - Test the game thoroughly for bugs and edge cases, both in single-player and multiplayer modes. [X]
+    - Address and fix any issues found during testing. [X]

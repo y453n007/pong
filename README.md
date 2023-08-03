@@ -7,9 +7,13 @@ This project is about creating a website for the mighty [Pong] contest!
             .
             .
             .
-## Get start
+
+## Get started
 
     to start the project run
         npm i
         npm run dev
 
+## Game
+
+    The main purpose of this website is to play Pong versus other players.

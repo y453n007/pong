@@ -1,24 +1,26 @@
 
-const PLAYER_HEIGHT = 100;
-const PLAYER_WIDTH = 20;
+const PLAYER_HEIGHT = 80;
+const PLAYER_WIDTH = 10;
 
 export class Ball {
 	x: number;
 	y: number;
-	radius: number;
+	width: number;
+	hieght: number;
 	speed: number;
 	velocityX: number;
 	velocityY: number;
 	color: string;
 
-  constructor(_x:number, _y:number, _s:number, _r:number) {
+  constructor(_x:number, _y:number, _s:number,) {
 		this.x = _x / 2;
 		this.y = _y / 2;
-		this.radius = _r;
+		this.width = 15;
+		this.hieght = 15;
 		this.speed = _s;
-		this.velocityX = 5;
-		this.velocityY = 5;
-		this.color = "#DC5F00";
+		this.velocityX = 1;
+		this.velocityY = 1;
+		this.color = "#EEEEEE";
   }
 }
 
@@ -27,14 +29,18 @@ export class Net  {
 	y: number;
 	width: number;
 	height: number;
+	wallWidth: number;
+	wallHieght: number;
 	color: string;
 
 	constructor(_x: number) {
 		this.x = _x / 2 - 1;
 		this.y = 0;
-		this.width = 2;
+		this.width = 10;
 		this.height = 10;
-		this.color = "#CF0A0A";
+		this.wallWidth = _x - 20;
+		this.wallHieght = 7;
+		this.color = "#EEEEEE";
 	}
 }
 
@@ -51,7 +57,7 @@ export class Player  {
 			this.y = _y / 2 - PLAYER_HEIGHT / 2;
 			this.width = PLAYER_WIDTH;
 			this.height = PLAYER_HEIGHT;
-			this.color = "#DC5F00";
+			this.color = "#EEEEEE";
 			this.score = 0;
   }
 }
@@ -69,7 +75,7 @@ export class Bot {
     this.y = _y / 2 - PLAYER_HEIGHT / 2,
 		this.width = PLAYER_WIDTH;
 		this.height = PLAYER_HEIGHT;
-		this.color = "#DC5F00";
+		this.color = "#EEEEEE";
 		this.score = 0;
 	}
 }

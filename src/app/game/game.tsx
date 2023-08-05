@@ -1,15 +1,18 @@
 'use client'
 import React, { useEffect } from 'react'
+import * as Math from 'mathjs';
 import { Ball, Net, Player, Bot } from '../utils/gameObjects'
 
 
 //Game Var
 const BOT_L = 0.5;
-const SPEED = 0.2;
-const DELTA_SPEED = 0.2;
+const SPEED = 1.5;
+const DELTA_SPEED = 0.5;
 const FPS = 60;
-
-																// Draw shapes
+const BETA = 45;
+const VELOCITYX = - 5;
+const VELOCITYY = 5;
+				// Draw shapes
 /*Draw Rect*/
 const drawRect = (x:number, y:number, w:number, h:number, color:string, ctx:CanvasRenderingContext2D) => {
 	ctx.fillStyle = color;
@@ -17,14 +20,14 @@ const drawRect = (x:number, y:number, w:number, h:number, color:string, ctx:Canv
 }
 
 /*Draw Text*/
-export const drawScore = (text: any, x: number, y: number, color: string, ctx:CanvasRenderingContext2D) => {
+const drawScore = (text: any, x: number, y: number, color: string, ctx:CanvasRenderingContext2D) => {
 	ctx.fillStyle = color;
 	ctx.font = "48px Qahiri";
 	ctx.fillText(text, x, y);
 }
 
 // Draw Net
-export const drawNet = (canvas: HTMLCanvasElement, ctx:CanvasRenderingContext2D, net: Net) => {
+const drawNet = (canvas: HTMLCanvasElement, ctx:CanvasRenderingContext2D, net: Net) => {
     for (let i = 19; i <= canvas.height - 22; i+= 22) {
       drawRect(net.x, net.y + i, net.width, net.height, net.color, ctx);
     }
@@ -32,43 +35,43 @@ export const drawNet = (canvas: HTMLCanvasElement, ctx:CanvasRenderingContext2D,
 }
 
 // Redraw Canvas
-export const  render = (canvas: HTMLCanvasElement, ctx:CanvasRenderingContext2D, ball: Ball, net: Net, player: Player, bot: Bot)  => {
+const  render = (canvas: HTMLCanvasElement, ctx:CanvasRenderingContext2D, ball: Ball, net: Net, player: Player, bot: Bot)  => {
 	drawRect(0, 0, canvas.width, canvas.height, "#000000", ctx);                         // THE TABLE
 	drawNet(canvas, ctx, net);                                                           // THE MIDDLE LINE
-	drawScore(player.score, (2/5) * canvas.width, canvas.height / 5, "#EEEEEE", ctx);    // LEFT SCORE
-	drawScore(bot.score, (3/5) * canvas.width, canvas.height / 5, "#EEEEEE", ctx);       // RIGHT SCORE
+	drawScore(player.score, (2/5) * canvas.width, canvas.height / 8, "#EEEEEE", ctx);    // LEFT SCORE
+	drawScore(bot.score, (3/5) * canvas.width, canvas.height / 8, "#EEEEEE", ctx);       // RIGHT SCORE
 	drawRect(player.x, player.y, player.width, player.height, player.color, ctx);        // THE PLAYER
 	drawRect(bot.x, bot.y, bot.width, bot.height, bot.color, ctx);                       // THE BOT
-	drawRect(ball.x, ball.y, ball.width, ball.hieght,ball.color, ctx);                   // THE BALL
-	drawRect(10, 5, net.wallWidth, net.wallHieght, "#EEEEEE", ctx);                      // UP WALL 
-	drawRect(10, canvas.height - 12, net.wallWidth, net.wallHieght, "#EEEEEE", ctx);     // DOWN WALL   
+	drawRect(ball.x, ball.y, ball.width, ball.height,ball.color, ctx);                   // THE BALL
+	drawRect(10, 5, net.wallWidth, net.wallHeight, "#EEEEEE", ctx);                      // UP WALL 
+	drawRect(10, canvas.height - 12, net.wallWidth, net.wallHeight, "#EEEEEE", ctx);     // DOWN WALL   
 }
 
 // Reset Ball
-export const resetBall = (canvas: HTMLCanvasElement, ball: Ball) => {
+const resetBall = (canvas: HTMLCanvasElement, ball: Ball) => {
     ball.x = canvas.width / 2;
     ball.y = canvas.height / 2;
     ball.speed = SPEED;
-    ball.velocityX = - ball.velocityX;
+    ball.velocityX = VELOCITYX;
+    ball.velocityY = VELOCITYY;
 }
 
 // Check Collision
-export const collision = (b: any, p: any) => {
+const collision = (b: Ball, p: Bot | Player) => {
 	// ball
-	b.top = b.y ;
-	b.bottom = b.y + p.width / 2;
-	b.left = b.x - p.width / 2;
-	b.right = b.x + b.width / 2;
+    const b_top = b.y;
+    const b_bottom = b.y + b.width;
+    const b_left = b.x;
+    const b_right = b.x + b.width;
 
-	// player
-	p.top = p.y - b.width / 2;
-	p.bottom = p.y + p.height;
-	p.left = p.x 
-	p.right = p.x + p.width;
-
-	return (
-		b.right > p.left && b.bottom > p.top && b.left < p.right && b.top < p.bottom
-	);
+    // player
+    const p_top = p.y;
+    const p_bottom = p.y + p.height;
+    const p_left = p.x;
+    const p_right = p.x + p.width;
+    return (
+      b_right > p_left && b_bottom > p_top && b_left < p_right && b_top < p_bottom
+    );
 }
 
 // Count the bot pos
@@ -78,42 +81,59 @@ const lerp = (a: number, b: number, t: number) => {
 	);
 }
 
+const ballBounce = (b: Ball, p: Player | Bot) => {
+	let relativeIntersectY = ((p.y + (p.height / 2)) - (b.y + (b.height / 2)));
+	let normalIntersectY = relativeIntersectY / (p.height / 2);
+	let beta = normalIntersectY * BETA;
+	let pi = Math.pi;
+	// convert the result to radian
+  beta = beta * (pi / 180);
+	let sign = Math.sign(b.velocityX);
+	b.velocityX = Math.abs(Math.cos(beta)) * b.speed * (-sign);
+	b.velocityY = - Math.sin(beta) * b.speed;
+}
+
+
 // update : pos, mov, score, ...
 const update = (canvas:HTMLCanvasElement, player: Player, ball: Ball, bot: Bot) => {
+	
 	//ball mov
-	ball.y += ball.velocityY * ball.speed;
-	ball.x += ball.velocityX * ball.speed;
+	ball.y += ball.velocityY;
+	ball.x += ball.velocityX;
+	console.log("X:  ", ball.velocityX);
 
 	// ball hit wall
-	if (ball.y + ball.width / 2 > canvas.height - 17 || ball.y - 12 < 0) {
-		ball.velocityY = -ball.velocityY
+	if (ball.y + ball.height > canvas.height - 12 || ball.y  < 12) {
+		ball.velocityY = - ball.velocityY;
 	}
 
 	// ball hit player
 	let selectPlayer = ball.x < canvas.width / 2 ? player : bot;
 	if (collision(ball, selectPlayer)) {
-			ball.velocityY = -ball.velocityY
-			ball.velocityX = -ball.velocityX;
-			if (ball.speed < 15.5) {ball.speed += DELTA_SPEED;}
+		ballBounce(ball, selectPlayer);
+		ball.speed < 20 ? ball.speed += DELTA_SPEED : ball.speed;
 	}
 	
 	// bot mov 
 	let targetPos = ball.y - bot.height / 2;
-	let currentPos = bot.y + ball.hieght / 2;
+	let currentPos = bot.y + ball.height / 2;
 	bot.y = lerp(currentPos, targetPos, BOT_L)
-
+	if (bot.y  < 12) {
+		bot.y = 12;
+	} else if (bot.y  > canvas.height - bot.height - 12) {
+		bot.y = canvas.height - bot.height - 12;
+	}
 	// Score update
 	if (ball.x - ball.width / 2 < 0) {
-			bot.score++;
-			resetBall(canvas, ball);
+		bot.score++;
+		resetBall(canvas, ball);
 	} else if (ball.x + ball.width / 2 > canvas.width) {
-			player.score++;
-			resetBall(canvas, ball);
+		player.score++;
+		resetBall(canvas, ball);
 	}
 }
 
 const CanvasComponent = () => {
-  // const canvas:any = useRef(null);
 	useEffect(() => {
     const canvas = document.querySelector("#ping") as HTMLCanvasElement;
     const ctx = canvas.getContext("2d");
@@ -121,21 +141,25 @@ const CanvasComponent = () => {
     const ball = new Ball(canvas.width , canvas.height, SPEED);
     const bot = new Bot(canvas.width, canvas.height);
     const net = new Net(canvas.width);
+		// Mouse events listener
     canvas.addEventListener("mousemove", (e) => {
-      if (canvas) {
-        let rect = canvas.getBoundingClientRect();
-        player.y = e.clientY - rect.top - player.height / 2;
+    	if (canvas) {
+				if (e.clientY  >=  player.height / 2 + 12 && e.clientY  <= canvas.height - player.height / 2 - 12) {
+					player.y = e.clientY - player.height / 2;
+				} else if (e.clientY  <  player.height / 2 + 12 && e.clientY) {
+					player.y = 12;
+				} else if (e.clientY  > canvas.height - player.height / 2 - 12) {
+					player.y = canvas.height - player.height - 12;
+				}
       }
     })
     if (ctx ) {
+			// Game logic
       const game = () => {
-          // Game logic
-        update(canvas, player, ball, bot);
-        render(canvas, ctx, ball, net, player, bot);
+				render(canvas, ctx, ball, net, player, bot);
+				update(canvas, player, ball, bot);
       };
-      
-			const intervalId = setInterval(game, 1000 / FPS);
-
+			const intervalId = setInterval(game, 1000 / FPS );
       return () => {
         clearInterval(intervalId);
       }

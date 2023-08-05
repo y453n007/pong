@@ -1,12 +1,14 @@
 
 const PLAYER_HEIGHT = 80;
 const PLAYER_WIDTH = 10;
+const VELOCITYX = - 5;
+const VELOCITYY = 5;
 
 export class Ball {
 	x: number;
 	y: number;
 	width: number;
-	hieght: number;
+	height: number;
 	speed: number;
 	velocityX: number;
 	velocityY: number;
@@ -16,10 +18,10 @@ export class Ball {
 		this.x = _x / 2;
 		this.y = _y / 2;
 		this.width = 15;
-		this.hieght = 15;
+		this.height = 15;
 		this.speed = _s;
-		this.velocityX = 1;
-		this.velocityY = 1;
+		this.velocityX = VELOCITYX;
+		this.velocityY = VELOCITYY;
 		this.color = "#EEEEEE";
   }
 }
@@ -30,7 +32,7 @@ export class Net  {
 	width: number;
 	height: number;
 	wallWidth: number;
-	wallHieght: number;
+	wallHeight: number;
 	color: string;
 
 	constructor(_x: number) {
@@ -39,7 +41,7 @@ export class Net  {
 		this.width = 10;
 		this.height = 10;
 		this.wallWidth = _x - 20;
-		this.wallHieght = 7;
+		this.wallHeight = 7;
 		this.color = "#EEEEEE";
 	}
 }

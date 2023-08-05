@@ -15,6 +15,7 @@
 [inProgress!!] ~ User Input Handling:
     - Handle keyboard events to allow players to control their paddles. [...]
     - Update paddle positions based on user input. [...]
+    ******* double check the velocity calculation *****
 
 [waiting!!] ~ Game Logic:
     - Implement the game rules and mechanics:
